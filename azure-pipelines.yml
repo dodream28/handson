@@ -1,0 +1,60 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: BuildDev
+  displayName: Build-dev image
+  jobs:
+  - job: Build
+    displayName: Build-dev
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'acr'
+        repository: 'challingedev'
+        command: 'BuildAndPush'
+        Dockerfile: '$(Build.SourcesDirectory)/Dev-Image/Dockerfile.yml'
+        tags: |
+          $(tag)
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'acr'
+        repository: 'challingedev'
+        command: 'BuildAndPush'
+        Dockerfile: '$(Build.SourcesDirectory)/Dev-Image/Dockerfile.yml'
+        tags:  'latest'
+- stage: BuildProd
+  displayName: Build-prod image
+  jobs:
+  - job: Build
+    displayName: Build-prod
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'acr'
+        repository: 'challingeprod'
+        command: 'BuildAndPush'
+        Dockerfile: '$(Build.SourcesDirectory)/Prod-Image/Dockerfile.yml'
+        tags: |
+          $(tag)
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'acr'
+        repository: 'challingeprod'
+        command: 'BuildAndPush'
+        Dockerfile: '$(Build.SourcesDirectory)/Prod-Image/Dockerfile.yml'
+        tags:  'latest'

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sprint-deployment
+  labels:
+    app: nginx_prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx_prod
+  template:
+    metadata:
+      labels:
+        app: nginx_prod
+    spec:
+      containers:
+      - name: sprint-prod
+        image: acroh.azurecr.io/challingeprod
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/mnt/azure"
+          name: volume
+      volumes:
+      - name: volume
+        persistentVolumeClaim:
+          claimName: pvcsprint
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxprod
+spec:
+  selector:
+    app: nginx_prod
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sprintingress
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/override-frontend-port: "80"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          service:
+            name: nginxprod
+            port: 
+              number: 80
+        pathType: Prefix
