@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: sprint-prod
-        image: k8sk8stest.azurecr.io/challingeprod:91
+        image: acrtest0528/challingeprod:91
         ports:
         - containerPort: 80
           protocol: TCP
