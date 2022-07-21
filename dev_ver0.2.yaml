@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: sprint-dev
-        image: acroh.azurecr.io/challingedev
+        image: acrtest0528.azurecr.io/challingedev
         ports:
         - containerPort: 80
           protocol: TCP
